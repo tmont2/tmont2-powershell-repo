@@ -22,7 +22,7 @@
             $counter += 1
         }
         $response.Content
-        Start-Sleep -Seconds 1
+        # Start-Sleep -Seconds 1
     }
 
     

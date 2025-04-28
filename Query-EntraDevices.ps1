@@ -25,29 +25,32 @@ $devices | Where-Object {$_.TrustType -eq "AzureAd"} | Select-Object DisplayName
 $devices.Count
 
 # query for all BitLocker key
-$blkeys = Get-MgInformationProtectionBitlockerRecoveryKey
+$blkeys = Get-MgInformationProtectionBitlockerRecoveryKey -All
 $blkeys.Count
 
 $DeviceList = foreach($device in $devices) {
     $recoveryKeys = $blkeys | Where-Object {$_.DeviceId -eq $device.DeviceId} |
         ForEach-Object {
             $Key = Get-MgInformationProtectionBitlockerRecoveryKey -BitlockerRecoveryKeyId $_.id -Property "key"
-            [ordered]@{BitLockerKey = $Key.key; BitLockerKeyID = $Key.id; CreatedDateTime = $Key.CreatedDateTime}
+            [ordered]@{BitLockerKey = $Key.key; BitLockerKeyID = $Key.id; CreatedDatePT = ($Key.CreatedDateTime).ToLocalTime()}
         }
     
     
     [PSCustomObject]@{
         DeviceName = $device.DisplayName
         DeviceID = $device.DeviceId
-        # Model = $device.Model
-        # Manufacturer = $device.Manufacturer
         BitLockerKey = $recoveryKeys | ConvertTo-Json -Compress
+        # Model = $device.Model
+        # Manufacturer = $device.Manufacturer        
+        # BitLockerKey = $recoveryKeys[-1].BitLockerKey
+        # BitLockerKeyID = $recoveryKeys[-1].BitLockerKeyID
+        # BitLockerKeyCreationDate = $recoveryKeys[-1].CreatedDatePT
     }
 }
 
 $desktopPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop)
-$SavePath = "$desktopPath\BitlockerKeys.xlsx"
-$DeviceList | Sort-Object DeviceName | Export-Excel -Path $SavePath -TableName BitlockerKeys -Autosize
+$SavePath = "$desktopPath\BitlockerKeys-02.xlsx"
+$DeviceList | Sort-Object DeviceName | Export-Excel -Path $SavePath -TableName BitlockerKeys # -Autosize
 
 # Disconnect from Microsoft Graph
 Disconnect-MgGraph

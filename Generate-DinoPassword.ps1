@@ -8,10 +8,14 @@
   Specify Path to output the passwords to a file
 
 #>
-function Generate-DinoPassword12 {
+function Generate-DinoPassword12 {    
+    [CmdletBinding()]
+    param (
+        [int]$NumberOfPasswords = 5
+    )
     $uri = "https://www.dinopass.com/password/strong"
     $counter = 1
-    $NumberOfPasswords = 5
+    
     $PassList = [System.Collections.Generic.List[String]]::new()
     while ($counter -le $NumberOfPasswords) {
         Write-Host "Counter: $counter"
@@ -24,7 +28,7 @@ function Generate-DinoPassword12 {
     return $PassList
 }
 
-$PasswordList = Generate-DinoPassword12
+$PasswordList = Generate-DinoPassword12 -NumberOfPasswords 10
 $PasswordList
 $PasswordList | ForEach-Object { $_.Length}
 
@@ -52,3 +56,4 @@ function Generate-DinoPassword {
 
 # Example 1
 # Generate-DinoPassword -Number 3 -Path "/home/terrence/Desktop/PassList.txt"
+

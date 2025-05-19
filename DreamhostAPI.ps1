@@ -81,7 +81,7 @@ function Remove-DHDnsRecord {
     }
     
     end {
-        Write-Host $response.data
+        # Write-Host $response.data
         return $response.data
     }
 }
